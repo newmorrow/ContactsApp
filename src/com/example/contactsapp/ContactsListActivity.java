@@ -1,30 +1,23 @@
 package com.example.contactsapp;
 
+import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract.CommonDataKinds.Email;
-import android.view.Gravity;
+import android.provider.ContactsContract.Contacts;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.contactsapp.PermissionDialogFragment.PermissionsDialogListener;
 
-import static android.provider.ContactsContract.*;
-
 public class ContactsListActivity extends ListActivity implements PermissionsDialogListener, LoaderCallbacks<Cursor> {
 
+	private static final String TAG_PERMISSIONS_DIALOG = "com.example.contactsapp.Permissions";
+	private static final String TAG_EMAIL_SEND = "com.example.contactsapp.SendEmail";
+	
 	private static final String[] FROM_COLUMNS = { Contacts.DISPLAY_NAME_PRIMARY, Contacts.PHOTO_THUMBNAIL_URI };
 	private static final int[] TO_IDS = { R.id.contact_name, R.id.contact_img };
 
@@ -35,35 +28,20 @@ public class ContactsListActivity extends ListActivity implements PermissionsDia
 	        Contacts.PHOTO_THUMBNAIL_URI
 	};
 
-	private static final String[] EMAIL_PROJECTION = { Email.ADDRESS };
-	private static final String EMAIL_SELECTION = Data.LOOKUP_KEY + "= ?";
 
 	private ContactsCursorAdapter listAdapter;
-
-	private ProgressBar buildProgressBar() {
-		ProgressBar progressBar = new ProgressBar(this);
-		progressBar.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-		progressBar.setIndeterminate(true);
-		return progressBar;
-	}
-
-	private TextView buildEmptyPlaceholder() {
-		TextView textView = new TextView(this);
-		textView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-		textView.setText(getText(R.string.empty_contacts));
-		textView.setTextSize(20);
-		return textView;
-	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.a_contacts_list);
 		if (savedInstanceState == null) {
 			PermissionDialogFragment permissionDialog = new PermissionDialogFragment();
 			permissionDialog.setPermissionListener(this);
-			permissionDialog.show(getFragmentManager(), "permissions");
+			permissionDialog.show(getFragmentManager(), TAG_PERMISSIONS_DIALOG);
         }
-		setEmptyView(buildProgressBar());
+		View progressBar = findViewById(R.id.progress_bar);
+		progressBar.setVisibility(View.VISIBLE);
 
 		listAdapter = new ContactsCursorAdapter(
 		        this,
@@ -79,7 +57,12 @@ public class ContactsListActivity extends ListActivity implements PermissionsDia
 	
 	@Override
     public void onAcceptPermission() {
-	    //do nothing
+		EmailSenderFragment emailFragment = new EmailSenderFragment();
+		emailFragment.setRetainInstance(true);
+		
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		transaction.add(emailFragment, TAG_EMAIL_SEND);
+		transaction.commit();
     }
 
 	@Override
@@ -100,18 +83,10 @@ public class ContactsListActivity extends ListActivity implements PermissionsDia
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		setEmptyView(buildEmptyPlaceholder());
-		listAdapter.swapCursor(data);
-	}
+		View progressBar = findViewById(R.id.progress_bar);
+		progressBar.setVisibility(View.GONE);
 
-	private void setEmptyView(View newEmptyView) {
-		ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
-		View emptyView = getListView().getEmptyView();
-		if (emptyView != null) {
-			root.removeView(emptyView);
-		}
-		root.addView(newEmptyView);
-		getListView().setEmptyView(newEmptyView);
+		listAdapter.swapCursor(data);
 	}
 
 	@Override
@@ -123,37 +98,9 @@ public class ContactsListActivity extends ListActivity implements PermissionsDia
 	public void onListItemClick(ListView listView, View view, int position, long id) {
 		Cursor cursor = listAdapter.getCursor();
 		cursor.moveToPosition(position);
-
 		String lookupKey = cursor.getString(cursor.getColumnIndex(Contacts.LOOKUP_KEY));
-		String[] emails = getContactEmails(lookupKey);
-		if (emails.length == 0) {
-			Toast.makeText(this, R.string.no_email_text, Toast.LENGTH_SHORT).show();
-		} else {
-			Intent mailIntent = new Intent(Intent.ACTION_SENDTO);
-			mailIntent.setData(Uri.parse("mailto:"));
-			mailIntent.putExtra(Intent.EXTRA_EMAIL, emails);
-			mailIntent.putExtra(Intent.EXTRA_SUBJECT, getText(R.string.default_email_subject));
-			mailIntent.putExtra(Intent.EXTRA_TEXT, getText(R.string.default_email_text));
-
-			if (mailIntent.resolveActivity(getPackageManager()) != null) {
-				startActivity(mailIntent);
-			}
-		}
-	}
-
-	private String[] getContactEmails(String lookupKey) {
-		Cursor cursor = getContentResolver().query(
-		        Email.CONTENT_URI,
-		        EMAIL_PROJECTION,
-		        EMAIL_SELECTION,
-		        new String[] { lookupKey },
-		        null
-		        );
-		String[] emails = new String[cursor.getCount()];
-		while (cursor.moveToNext()) {
-			emails[cursor.getPosition()] = cursor.getString(cursor.getColumnIndex(Email.ADDRESS));
-		}
-		cursor.close();
-		return emails;
+		
+		EmailSenderFragment emailFragment = (EmailSenderFragment) getFragmentManager().findFragmentByTag(TAG_EMAIL_SEND);
+		emailFragment.sendEmailToContact(lookupKey);
 	}
 }

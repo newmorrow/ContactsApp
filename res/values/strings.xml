@@ -7,6 +7,7 @@
 	<string name="default_email_subject">Message from new ContactsApp</string>
 	<string name="default_email_text">Hello! I was sent from new ContactsApp</string>
 	<string name="no_email_text">This contact has no emails</string>
+	<string name="no_email_apps">Email apps were not found</string>
 	<string name="permission_question">Application requests access to permission for reading contacts</string>
 	<string name="permission_accept">Accept</string>
 	<string name="permission_decline">Decline</string>
