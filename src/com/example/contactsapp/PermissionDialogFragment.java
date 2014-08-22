@@ -39,7 +39,9 @@ public class PermissionDialogFragment extends DialogFragment {
 	
 	@Override
 	public void onCancel(DialogInterface dialog) {
-		listener.onDenclinePermission();
+		if (listener != null) {
+			listener.onDenclinePermission();
+		}
 	}
 	
 	public interface PermissionsDialogListener {

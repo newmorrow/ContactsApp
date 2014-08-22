@@ -1,5 +1,6 @@
 package com.example.contactsapp;
 
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -28,18 +29,18 @@ public class ContactsListActivity extends ListActivity implements PermissionsDia
 	        Contacts.PHOTO_THUMBNAIL_URI
 	};
 
-
 	private ContactsCursorAdapter listAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.a_contacts_list);
 		if (savedInstanceState == null) {
 			PermissionDialogFragment permissionDialog = new PermissionDialogFragment();
 			permissionDialog.setPermissionListener(this);
 			permissionDialog.show(getFragmentManager(), TAG_PERMISSIONS_DIALOG);
-        }
+        } 
 		View progressBar = findViewById(R.id.progress_bar);
 		progressBar.setVisibility(View.VISIBLE);
 
@@ -57,12 +58,7 @@ public class ContactsListActivity extends ListActivity implements PermissionsDia
 	
 	@Override
     public void onAcceptPermission() {
-		EmailSenderFragment emailFragment = new EmailSenderFragment();
-		emailFragment.setRetainInstance(true);
-		
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.add(emailFragment, TAG_EMAIL_SEND);
-		transaction.commit();
+		//do nothing
     }
 
 	@Override
@@ -100,7 +96,8 @@ public class ContactsListActivity extends ListActivity implements PermissionsDia
 		cursor.moveToPosition(position);
 		String lookupKey = cursor.getString(cursor.getColumnIndex(Contacts.LOOKUP_KEY));
 		
-		EmailSenderFragment emailFragment = (EmailSenderFragment) getFragmentManager().findFragmentByTag(TAG_EMAIL_SEND);
-		emailFragment.sendEmailToContact(lookupKey);
+		EmailSenderFragment emailFragment = new EmailSenderFragment(lookupKey);
+		emailFragment.setCancelable(true);
+		emailFragment.show(getFragmentManager(), TAG_EMAIL_SEND);
 	}
 }

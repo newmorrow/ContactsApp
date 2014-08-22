@@ -1096,8 +1096,8 @@ containing a value of this type.
         public static final int beginning=0x7f050011;
         public static final int checkbox=0x7f05002e;
         public static final int collapseActionView=0x7f05000d;
-        public static final int contact_img=0x7f05003d;
-        public static final int contact_name=0x7f05003e;
+        public static final int contact_img=0x7f05003e;
+        public static final int contact_name=0x7f05003f;
         public static final int default_activity_button=0x7f050029;
         public static final int dialog=0x7f05000e;
         public static final int disableHome=0x7f050008;
@@ -1117,6 +1117,7 @@ containing a value of this type.
         public static final int never=0x7f050009;
         public static final int none=0x7f050010;
         public static final int normal=0x7f050000;
+        public static final int progressBar=0x7f05003d;
         public static final int progress_bar=0x7f05001a;
         public static final int progress_circular=0x7f050018;
         public static final int progress_horizontal=0x7f050019;
@@ -1195,8 +1196,9 @@ containing a value of this type.
         public static final int abc_search_dropdown_item_icons_2line=0x7f030016;
         public static final int abc_search_view=0x7f030017;
         public static final int abc_simple_decor=0x7f030018;
-        public static final int i_contact_item=0x7f030019;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001a;
+        public static final int f_email_progress=0x7f030019;
+        public static final int i_contact_item=0x7f03001a;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001b;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
