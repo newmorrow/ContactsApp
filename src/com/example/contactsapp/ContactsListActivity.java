@@ -1,7 +1,5 @@
 package com.example.contactsapp;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;

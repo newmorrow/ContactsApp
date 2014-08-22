@@ -2,7 +2,6 @@ package com.example.contactsapp;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
@@ -14,10 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.CommonDataKinds.Email;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class EmailSenderFragment extends DialogFragment implements LoaderCallbacks<Cursor> {
